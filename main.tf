@@ -1,3 +1,44 @@
+#------------------------VARIABLES--------------------------------
+
+variable "number_example" {
+  description = "An example of number variable in Terraform"
+  type = number
+  default = 18
+}
+
+variable "list_example" {
+  description = "An example of a list in Terraform"
+  type        = list
+  default     = ["a", "b", "c"]
+}
+
+# Combine type constraints, Here is list input variable that requires all the items in the list to be numbers
+
+variable "list_numeric_example" {
+  description = "An example of numeric list in Terraform"
+  type = list(number)
+  default = [1, 2, 3]
+}
+
+variable "list_string_example" {
+  description = "An example of string list in Terraform"
+  type = list(string)
+  default = ["hanuaman1", "hanuman2", "hanuman3"]
+}
+
+# here is map that requires all the values to be strings
+variable "map_example" {
+  description = "An example of a map in Terraform"
+  type = map(string)
+  default = {
+    "name": "raju"
+    "age": 32
+    "dob": "12-june-1987"
+  }
+}
+
+#--------------------------PROVIDERS------------------------------
+
 provider "aws" {
   profile = "default"
   region = "us-east-2"
