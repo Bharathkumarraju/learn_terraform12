@@ -13,7 +13,7 @@ resource "aws_instance" "bharths_ec2" {
          sudo service apache2 restart
   EOF
 
-  tags {
+  tags = {
     Name = "terraform-example"
   }
 }
