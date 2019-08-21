@@ -37,6 +37,45 @@ variable "map_example" {
   }
 }
 
+# Create more complicated structural types using object and tuple type constraints
+
+variable "object_example" {
+  description = "An example of structural type in Terraform"
+  type = object({
+    name = string
+    age = number
+    tags = list(string)
+    enabled = bool
+  })
+  default = {
+    name = "raju123"
+    age = 32
+    tags = ["a", "b", "c"]
+    enabled = true
+  }
+}
+
+
+
+variable "object_example_with_error" {
+  description = "An example of a structural type in Terraform with an Error"
+  type = object({
+    name = string
+    age = number
+    tags = list(string)
+    enabled = bool
+  })
+  default = {
+    name = "raju123"
+    age = 33
+    tags = ["a", "b", "c"]
+    enabled = "true"
+  }
+}
+
+
+
+
 #--------------------------PROVIDERS------------------------------
 
 provider "aws" {
