@@ -134,6 +134,7 @@ resource "aws_autoscaling_group" "bharaths_ASG" {
   health_check_type = "ELB"
   max_size = 5
   min_size = 2
+  desired_capacity = 2
   tag {
     key = "Name"
     propagate_at_launch = true
