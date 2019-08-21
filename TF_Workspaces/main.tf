@@ -15,5 +15,6 @@ terraform {
 
 resource "aws_instance" "hanumans_ec2" {
   ami = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  instance_type = terraform.workspace == "default" ? "t2.medium" : "t2.micro"
+
 }
