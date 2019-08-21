@@ -86,7 +86,7 @@ provider "aws" {
   profile = "default"
   region = "us-east-2"
 }
-# Variables aren't allowed in a backend configuration.
+# Variables aren't allowed in a backend configuration..
 terraform {
   backend "s3" {
 #    bucket = "bharaths-terraform-up-and-running"

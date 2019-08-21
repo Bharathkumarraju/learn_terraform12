@@ -1,4 +1,4 @@
-# terraform init -backend-config=backend.hcl
+# terraform init -backend-config=backend.hcl   ..
 
 bucket         = "bharaths-terraform-up-and-running"
 region         = "us-east-2"
