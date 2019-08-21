@@ -74,7 +74,11 @@ variable "object_example_with_error" {
 }
 
 
-
+variable "server_port" {
+  description = "The port that server will use for HTTP Requests"
+  type = number
+  default = 8080
+}
 
 #--------------------------PROVIDERS------------------------------
 
@@ -87,12 +91,12 @@ resource "aws_instance" "bharths_ec2" {
   ami = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
   availability_zone = "us-east-2a"
-  count = 1
+  count = 2
   vpc_security_group_ids = [aws_security_group.bharths_sg.id]
   user_data = <<-EOF
          #!/bin/bash
          echo "Hello, World!" > index.html
-         nohup busybox httpd -f -p 8080 &
+         nohup busybox httpd -f -p ${var.server_port} &
   EOF
 
   tags = {
@@ -103,9 +107,41 @@ resource "aws_instance" "bharths_ec2" {
 resource "aws_security_group" "bharths_sg" {
   name = "terraform-example-instance"
   ingress {
-    from_port = 8080
+    from_port = var.server_port
     protocol = "tcp"
-    to_port = 8080
+    to_port = var.server_port
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+
+#----------------------------------------------OUTPUTS-------------------------------------
+
+output "bharaths_ec2_publicip" {
+  value = aws_instance.bharths_ec2.*.public_ip
+  description = "The public IP Address of the web server"
+}
+
+output "bharaths_ec2_publicdns" {
+  value = aws_instance.bharths_ec2.*.public_dns
+  description = "The Public DNS of the web server"
+}
+
+output "bharath_ec2_0_public_ip" {
+  value = aws_instance.bharths_ec2[0].public_ip
+  description = "public ip of first instance"
+}
+
+output "bharath_ec2_0_public_dns" {
+  value = aws_instance.bharths_ec2[0].public_dns
+  description = "Public DNS of first instance"
+}
+
+output "bharath_ec2_1_public_ip" {
+  value = aws_instance.bharths_ec2[1].public_ip
+  description = "Public ip of the second instance"
+}
+output "bharath_ec2_1_public_dns" {
+  value = aws_instance.bharths_ec2[1].public_dns
+  description = "public DNS of second instance"
 }
