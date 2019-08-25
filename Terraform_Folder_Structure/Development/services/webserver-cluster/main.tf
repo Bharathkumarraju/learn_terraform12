@@ -12,6 +12,10 @@ module "webserver_cluster" {
   instance_type = "t2.micro"
   max_size = "5"
   min_size = "2"
+  custom_tags = {
+    Owner = "Team-bharath"
+    DevelopedBy = "Terraform"
+  }
 }
 
 # Now imagine in the Development environment. We needed to expose an extra port just for testing

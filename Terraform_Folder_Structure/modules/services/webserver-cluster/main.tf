@@ -82,7 +82,18 @@ resource "aws_autoscaling_group" "bharaths_ASG" {
   tag {
     key = "Name"
     propagate_at_launch = true
+    # Each tag must be specified as an inline block—that is, an argument you set within a resource of the format:
     value = "${var.cluster_name}"
+  }
+  # when using for_each with a list, the key will be the index and the value will be the item in the list at that index
+  # when using for_each with a map, the key and value will be one of the key-value pairs in the map.
+  dynamic "tag" {
+    for_each = var.custom_tags
+    content {
+      key = tag.key
+      value = tag.value
+      propagate_at_launch = true
+    }
   }
 }
 
