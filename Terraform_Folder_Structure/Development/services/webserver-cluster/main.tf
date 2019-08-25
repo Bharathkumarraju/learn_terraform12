@@ -13,7 +13,9 @@ module "webserver_cluster" {
   max_size = "5"
   min_size = "2"
   enable_autoscaling = false
-  enable_new_user_data = true
+#  enable_new_user_data = true
+  ami = "ami-0c55b159cbfafe1f0"
+  server_text = "New server text"
   custom_tags = {
     Owner = "Team-bharath"
     DevelopedBy = "Terraform"
