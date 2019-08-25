@@ -1,6 +1,6 @@
 
 provider "aws" {
-  profile = var.aws_region
+  profile = var.aws_profile
   region = var.aws_region
 }
 # Variables aren't allowed in a backend configuration..
@@ -42,7 +42,7 @@ data "aws_subnet_ids" "bharath_subnets"{
 
 data terraform_remote_state "db" {
   backend = "s3"
-  config {
+  config = {
     bucket = "bharaths-terraform-up-and-running"
     key = "development/data-stores/mysql/terraform.tfstate"
     region = "us-east-2"
@@ -51,10 +51,9 @@ data terraform_remote_state "db" {
 
 data "template_file" "user_data" {
   template = file("user-data.sh")
-
-  vars {
+  vars = {
     server_port = var.server_port
-    db_address = data.terraform_remote_state.db.outputs.address
+    db_address = data.terraform_remote_state.db.outputs.Address
     db_port = data.terraform_remote_state.db.outputs.port
   }
 }
