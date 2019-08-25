@@ -40,13 +40,23 @@ data "aws_subnet_ids" "bharath_subnets"{
   vpc_id = data.aws_vpc.bharaths_vpc.id
 }
 
+data terraform_remote_state "db" {
+  backend = "s3"
+  config {
+    bucket = "bharaths-terraform-up-and-running"
+    key = "development/data-stores/mysql/terraform.tfstate"
+    region = "us-east-2"
+  }
+}
 resource "aws_launch_configuration" "bharaths_launchconfig" {
   image_id = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
   security_groups = [aws_security_group.bharths_sg.id]
   user_data = <<-EOF
          #!/bin/bash
-         echo "Hello, World!" > index.html
+         echo "Hello, World!" >> index.html
+         echo "${data.terraform_remote_state.db.outputs.address}" >> index.html
+         echo "${data.terraform_remote_state.db.outputs.port}" >> index.html
          nohup busybox httpd -f -p ${var.server_port} &
 EOF
   lifecycle {
