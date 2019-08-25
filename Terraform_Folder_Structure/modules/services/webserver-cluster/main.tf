@@ -141,22 +141,25 @@ resource "aws_lb_listener_rule" "bharaths_asg_listerner_rule" {
 
 resource "aws_security_group" "bharaths_alb_securitygroup" {
   name = "${var.cluster_name}-alb"
-
-  # Allow inbound HTTP Requests
-  ingress {
-    from_port = local.http_port
-    protocol = local.tcp_protocol
-    to_port = local.http_port
-    cidr_blocks = local.all_ips
-  }
-  # Allow all outboubnd requests
-  egress {
-    from_port = local.any_port
-    protocol = local.any_protocol
-    to_port = local.any_port
-    cidr_blocks = local.all_ips
-  }
 }
+resource "aws_security_group_rule" "allow_http_inbound" {
+  from_port = local.http_port
+  protocol = local.tcp_protocol
+  security_group_id = aws_security_group.bharaths_alb_securitygroup.id
+  to_port = local.http_port
+  cidr_blocks = local.all_ips
+  type = "ingress"
+}
+
+resource "aws_security_group_rule" "allow_all_outbound" {
+  from_port = local.any_port
+  protocol = local.any_protocol
+  security_group_id = aws_security_group.bharaths_alb_securitygroup.id
+  to_port = local.any_port
+  type = "egress"
+  cidr_blocks = local.all_ips
+}
+
 
 resource "aws_security_group" "bharths_sg" {
   name = "${var.cluster_name}-instance"
