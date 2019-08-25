@@ -1,3 +1,10 @@
+locals {
+  http_port = 80
+  any_port = 0
+  any_protocol = "-1"
+  tcp_protocol = "tcp"
+  all_ips = ["0.0.0.0/0"]
+}
 
 # Variables aren't allowed in a backend configuration..
 terraform {
@@ -39,14 +46,14 @@ data "aws_subnet_ids" "bharath_subnets"{
 data terraform_remote_state "db" {
   backend = "s3"
   config = {
-    bucket = "bharaths-terraform-up-and-running"
-    key = "development/data-stores/mysql/terraform.tfstate"
+    bucket = var.db_remote_state_bucket
+    key = var.db_remote_state_key
     region = "us-east-2"
   }
 }
 
 data "template_file" "user_data" {
-  template = file("user-data.sh")
+  template = file("${path.module}/user-data.sh")
   vars = {
     server_port = var.server_port
     db_address = data.terraform_remote_state.db.outputs.Address
@@ -57,7 +64,7 @@ data "template_file" "user_data" {
 
 resource "aws_launch_configuration" "bharaths_launchconfig" {
   image_id = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   security_groups = [aws_security_group.bharths_sg.id]
   user_data = data.template_file.user_data.rendered
   lifecycle {
@@ -70,18 +77,17 @@ resource "aws_autoscaling_group" "bharaths_ASG" {
   vpc_zone_identifier = data.aws_subnet_ids.bharath_subnets.ids
   target_group_arns = [aws_lb_target_group.bharaths_asg_targetgroup.arn]
   health_check_type = "ELB"
-  max_size = 5
-  min_size = 2
-  desired_capacity = 2
+  max_size = var.max_size
+  min_size = var.min_size
   tag {
     key = "Name"
     propagate_at_launch = true
-    value = "terraform-asg-example"
+    value = "${var.cluster_name}"
   }
 }
 
 resource "aws_lb" "bharaths_ALB" {
-  name = "terraform-asg-example"
+  name = "${var.cluster_name}"
   load_balancer_type = "application"
   subnets = data.aws_subnet_ids.bharath_subnets.ids
   security_groups = [aws_security_group.bharaths_alb_securitygroup.id]
@@ -89,7 +95,7 @@ resource "aws_lb" "bharaths_ALB" {
 
 resource "aws_lb_listener" "bharaths_alb_listener" {
   load_balancer_arn = aws_lb.bharaths_ALB.arn
-  port = 80
+  port = local.http_port
   protocol = "HTTP"
   # By default, return a simple 404 page
   default_action {
@@ -104,7 +110,7 @@ resource "aws_lb_listener" "bharaths_alb_listener" {
 
 
 resource "aws_lb_target_group" "bharaths_asg_targetgroup" {
-  name = "terraform-asg-example"
+  name = "${var.cluster_name}"
   port = var.server_port
   protocol = "HTTP"
   vpc_id = data.aws_vpc.bharaths_vpc.id
@@ -134,26 +140,26 @@ resource "aws_lb_listener_rule" "bharaths_asg_listerner_rule" {
 
 
 resource "aws_security_group" "bharaths_alb_securitygroup" {
-  name = "terraform-example-alb"
+  name = "${var.cluster_name}-alb"
 
   # Allow inbound HTTP Requests
   ingress {
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port = local.http_port
+    protocol = local.tcp_protocol
+    to_port = local.http_port
+    cidr_blocks = local.all_ips
   }
   # Allow all outboubnd requests
   egress {
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port = local.any_port
+    protocol = local.any_protocol
+    to_port = local.any_port
+    cidr_blocks = local.all_ips
   }
 }
 
 resource "aws_security_group" "bharths_sg" {
-  name = "terraform-example-instance"
+  name = "${var.cluster_name}-instance"
   ingress {
     from_port = var.server_port
     protocol = "tcp"
