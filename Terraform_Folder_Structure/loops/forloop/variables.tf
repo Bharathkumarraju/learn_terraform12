@@ -13,3 +13,9 @@ variable "hero_thousand_faces" {
     morpheus = "mentor"
   }
 }
+
+variable "bknames" {
+  description = "A list of names"
+  type = list(string)
+  default = ["hanuman", "Bhajrang", "Chalisa"]
+}

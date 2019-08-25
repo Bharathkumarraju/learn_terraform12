@@ -12,6 +12,7 @@ module "webserver_cluster" {
   instance_type = "t2.micro"
   max_size = "5"
   min_size = "2"
+  enable_autoscaling = false
   custom_tags = {
     Owner = "Team-bharath"
     DevelopedBy = "Terraform"
