@@ -48,17 +48,23 @@ data terraform_remote_state "db" {
     region = "us-east-2"
   }
 }
+
+data "template_file" "user_data" {
+  template = file("user-data.sh")
+
+  vars {
+    server_port = var.server_port
+    db_address = data.terraform_remote_state.db.outputs.address
+    db_port = data.terraform_remote_state.db.outputs.port
+  }
+}
+
+
 resource "aws_launch_configuration" "bharaths_launchconfig" {
   image_id = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
   security_groups = [aws_security_group.bharths_sg.id]
-  user_data = <<-EOF
-         #!/bin/bash
-         echo "Hello, World!" >> index.html
-         echo "${data.terraform_remote_state.db.outputs.address}" >> index.html
-         echo "${data.terraform_remote_state.db.outputs.port}" >> index.html
-         nohup busybox httpd -f -p ${var.server_port} &
-EOF
+  user_data = data.template_file.user_data.rendered
   lifecycle {
     create_before_destroy = true
   }
