@@ -96,7 +96,11 @@ resource "aws_autoscaling_group" "bharaths_ASG" {
   # when using for_each with a list, the key will be the index and the value will be the item in the list at that index
   # when using for_each with a map, the key and value will be one of the key-value pairs in the map.
   dynamic "tag" {
-    for_each = var.custom_tags
+    for_each = {
+      for key, value in var.custom_tags:
+          key => upper(value)
+          if key != "Name"
+    }
     content {
       key = tag.key
       value = tag.value

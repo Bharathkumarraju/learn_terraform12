@@ -16,3 +16,7 @@ output "for_string_directive" {
   %{~ endfor }
   EOF
 }
+
+output "if_elase_directive" {
+  value = "Hello, %{ if var.rajuname != ""}${var.rajuname}%{else} (unnamed) %{endif}"
+}

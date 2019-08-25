@@ -19,3 +19,8 @@ variable "bknames" {
   type = list(string)
   default = ["hanuman", "Bhajrang", "Chalisa"]
 }
+
+variable "rajuname" {
+  description = "A name to render"
+  type        = string
+}
