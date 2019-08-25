@@ -35,3 +35,46 @@ resource "aws_iam_user_policy_attachment" "ec2_access" {
   # Above one can also be written as
   # user = aws_iam_user.bharaths_iam_users[count.index].name
 }
+
+resource "aws_iam_policy" "cloudwatch_read_only" {
+  policy = data.aws_iam_policy_document.clouwatch_readonly.json
+  name = "cloud-watch-readonly"
+}
+
+data "aws_iam_policy_document" "clouwatch_readonly" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "cloudwatch_full_access" {
+  policy = data.aws_iam_policy_document.cloudwatch_full_access.json
+  name = "cloudwatch-full-access"
+}
+
+data "aws_iam_policy_document" "cloudwatch_full_access" {
+  statement {
+    effect    = "Allow"
+    actions   = ["cloudwatch:*"]
+    resources = ["*"]
+  }
+}
+
+
+resource "aws_iam_user_policy_attachment" "hanuman_cloudwatch_full_access" {
+  count = var.give_hanuman_cloudwatch_full_access ? 1 : 0
+  policy_arn = aws_iam_policy.cloudwatch_full_access.arn
+  user = aws_iam_user.bharaths_iam_users[1].name
+}
+
+resource "aws_iam_user_policy_attachment" "hanuman_cloudwatch_readonly_access" {
+  count = var.give_hanuman_cloudwatch_full_access ? 0 : 1
+  policy_arn = aws_iam_policy.cloudwatch_read_only.arn
+  user = aws_iam_user.bharaths_iam_users[1].name
+}
