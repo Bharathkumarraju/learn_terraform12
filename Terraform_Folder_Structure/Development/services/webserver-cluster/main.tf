@@ -7,7 +7,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket = "bharaths-terraform-up-and-running"
-    key = "stage/services/webserver-cluster/terraform.tfstate"
+    key = "development/services/webserver-cluster/terraform.tfstate"
     region = "us-east-2"
     dynamodb_table = "bharaths-terraform-up-and-running-locks"
     encrypt = true
