@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   alarm_name = "${var.cluster_name}-high-cpu-utilization"
   namespace = "AWS/EC2"
   metric_name = "CPUUtilizaition"
-  dimensions {
+  dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.bharaths_ASG.name
   }
   comparison_operator = "GreaterThanThreshold"
@@ -245,7 +245,7 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_credit_balance" {
   alarm_name = "${var.cluster_name}-low-cpu-credit-balance"
   namespace = "AWS/EC2"
   metric_name = "CPUCreditBalance"
-  dimensions {
+  dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.bharaths_ASG.name
   }
   comparison_operator = "LessThanThreshold"
